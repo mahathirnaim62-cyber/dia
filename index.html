@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <title>For Kona Habiba | Eternal Petals</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      user-select: none; /* subtle romantic feel, text still selectable if needed */
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(145deg, #fff5f7 0%, #ffe4ec 100%);
+      font-family: 'Segoe UI', 'Poppins', 'Dancing Script', system-ui, -apple-system, 'Inter', sans-serif;
+      overflow-x: hidden;
+      position: relative;
+      color: #4a2e3a;
+    }
+
+    /* floating heart background (global canvas) */
+    .heart-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      overflow: hidden;
+    }
+    .heart-particle {
+      position: absolute;
+      font-size: 1.2rem;
+      pointer-events: none;
+      animation: floatUp 7s linear forwards;
+      opacity: 0.7;
+      color: #ff6b8b;
+      text-shadow: 0 0 5px #ffb7c5;
+      z-index: 2;
+    }
+    @keyframes floatUp {
+      0% {
+        transform: translateY(100vh) scale(0.6);
+        opacity: 0.6;
+      }
+      100% {
+        transform: translateY(-10vh) scale(1.2);
+        opacity: 0;
+      }
+    }
+
+    /* Blur glowing orbs background */
+    .glow-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.5;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .orb1 { width: 50vw; height: 50vw; background: #ffbac8; top: -10vh; left: -20vw; }
+    .orb2 { width: 60vw; height: 60vw; background: #ffd9e3; bottom: -20vh; right: -30vw; }
+    .orb3 { width: 40vw; height: 40vw; background: #ff9eb0; top: 40%; left: 60%; }
+
+    /* main container */
+    .main-content {
+      position: relative;
+      z-index: 10;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1rem;
+    }
+
+    /* ---------- WELCOME SCREEN ---------- */
+    .welcome-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, #fff0f3, #ffdfe8);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      transition: opacity 1.2s cubic-bezier(0.2, 0.9, 0.4, 1.1), visibility 0.3s;
+      text-align: center;
+      gap: 1.8rem;
+    }
+    .welcome-screen.hide {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+    .welcome-screen h1 {
+      font-size: 3.2rem;
+      font-family: 'Dancing Script', cursive;
+      background: linear-gradient(135deg, #c73b5e, #e88b9e);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 6px 20px rgba(199, 59, 94, 0.2);
+      letter-spacing: 2px;
+      animation: gentleGlow 2s infinite alternate;
+    }
+    .welcome-screen p {
+      font-size: 1.3rem;
+      color: #b25d74;
+      font-weight: 400;
+      backdrop-filter: blur(2px);
+    }
+    .open-btn {
+      background: linear-gradient(45deg, #e88b9e, #f4b6c4);
+      border: none;
+      padding: 14px 38px;
+      font-size: 1.3rem;
+      font-weight: 600;
+      border-radius: 60px;
+      color: #fff3f5;
+      cursor: pointer;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1), 0 0 0 2px rgba(255,255,240,0.6);
+      transition: transform 0.2s, box-shadow 0.2s;
+      backdrop-filter: blur(2px);
+    }
+    .open-btn:hover {
+      transform: scale(1.02);
+      box-shadow: 0 18px 28px rgba(199, 59, 94, 0.3);
+    }
+    @keyframes gentleGlow {
+      0% { text-shadow: 0 0 3px #ffa5bb; }
+      100% { text-shadow: 0 0 18px #ff809e; }
+    }
+
+    /* Album sections */
+    .album-container {
+      display: none;
+      opacity: 0;
+      animation: fadeInUp 1s forwards;
+    }
+    .album-container.active {
+      display: block;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+
+    /* music control button */
+    .music-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: rgba(255,225,235,0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,210,220,0.9);
+      border-radius: 50px;
+      padding: 10px 18px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 200;
+      color: #b94767;
+      transition: all 0.2s;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    .music-btn:hover { background: #ffe2eb; transform: scale(1.02);}
+
+    /* Book-style photo album */
+    .book-section {
+      background: rgba(255, 248, 245, 0.6);
+      backdrop-filter: blur(4px);
+      border-radius: 48px;
+      padding: 2rem 1rem;
+      margin: 2rem 0;
+      box-shadow: 0 20px 35px rgba(0,0,0,0.05), inset 0 0 0 1px rgba(255,244,240,0.8);
+    }
+    .book-header {
+      text-align: center;
+      font-family: 'Dancing Script', cursive;
+      font-size: 2rem;
+      color: #be5e7a;
+      margin-bottom: 1rem;
+    }
+    .book-scrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      perspective: 1200px;
+    }
+    .page-card {
+      width: 100%;
+      max-width: 480px;
+      margin: 0 auto;
+      transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.2s;
+      transform-style: preserve-3d;
+    }
+    .page-card.flipping {
+      transform: rotateY(15deg) scale(0.96);
+      opacity: 0.7;
+    }
+    .polaroid {
+      background: #fffdf8;
+      border-radius: 18px;
+      padding: 18px 18px 22px 18px;
+      box-shadow: 0 25px 35px -12px rgba(0,0,0,0.2), 0 0 0 1px #fff6f0 inset;
+      transition: all 0.3s ease;
+      position: relative;
+      backdrop-filter: blur(1px);
+    }
+    .polaroid:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 30px 40px -14px rgba(160, 60, 80, 0.3);
+    }
+    .photo-frame {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      overflow: hidden;
+      border-radius: 14px;
+      background: #f7e3e8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 1px 8px rgba(0,0,0,0.02), 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .photo-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+    .polaroid:hover .photo-frame img {
+      transform: scale(1.02);
+    }
+    .romantic-caption {
+      text-align: center;
+      margin-top: 16px;
+      font-size: 1rem;
+      font-weight: 500;
+      color: #b35d77;
+      letter-spacing: 0.5px;
+    }
+    /* floating hearts in polaroid */
+    .heart-float-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      border-radius: 18px;
+    }
+    .mini-heart {
+      position: absolute;
+      font-size: 1rem;
+      animation: floatMini 4s infinite ease-in-out;
+      opacity: 0.7;
+      color: #ff6f8f;
+    }
+    @keyframes floatMini {
+      0% { transform: translateY(10px) translateX(0) scale(0.8); opacity: 0; }
+      20% { opacity: 0.9; }
+      80% { opacity: 0.7; }
+      100% { transform: translateY(-50px) translateX(15px) scale(1.2); opacity: 0; }
+    }
+    .flip-controls {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    .flip-btn {
+      background: rgba(255,235,240,0.8);
+      backdrop-filter: blur(8px);
+      border: none;
+      padding: 10px 24px;
+      border-radius: 60px;
+      font-weight: bold;
+      color: #a74b68;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 5px 10px rgba(0,0,0,0.05);
+    }
+    .flip-btn:active { transform: scale(0.96);}
+    .page-indicator {
+      text-align: center;
+      margin-top: 1rem;
+      color: #c28499;
+      font-weight: 500;
+    }
+
+    /* Timeline section */
+    .timeline-section, .memory-wall, .reasons-section, .ending-message {
+      background: rgba(255, 245, 242, 0.65);
+      backdrop-filter: blur(6px);
+      border-radius: 2rem;
+      padding: 2rem 1.5rem;
+      margin: 2.2rem 0;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    }
+    .section-title {
+      font-size: 1.8rem;
+      text-align: center;
+      font-family: 'Dancing Script', cursive;
+      color: #c65d7c;
+      margin-bottom: 2rem;
+      letter-spacing: 2px;
+    }
+    .timeline-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+    .timeline-item {
+      background: rgba(255,255,250,0.7);
+      padding: 1rem 1.4rem;
+      border-radius: 60px;
+      border-left: 6px solid #f09bb0;
+      transition: 0.2s;
+    }
+    /* memory wall sticky notes */
+    .sticky-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.8rem;
+    }
+    .sticky-note {
+      background: #fff9e8;
+      transform: rotate(-1deg);
+      padding: 1.2rem;
+      border-radius: 20px;
+      box-shadow: 8px 8px 12px rgba(0,0,0,0.05);
+      font-style: italic;
+      transition: 0.2s;
+      border-top: 1px solid #ffddcc;
+    }
+    .sticky-note:nth-child(even) { transform: rotate(2deg); background: #fff3e0;}
+    .sticky-note:hover { transform: scale(1.02) rotate(0deg); background: #fff5ea;}
+
+    /* reasons with animated reveal */
+    .reasons-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .reason-card {
+      background: rgba(255, 230, 235, 0.7);
+      padding: 1rem 1.5rem;
+      border-radius: 30px;
+      transform: translateX(-10px);
+      opacity: 0;
+      transition: all 0.5s ease;
+      font-weight: 500;
+    }
+    .reason-card.reveal {
+      transform: translateX(0);
+      opacity: 1;
+    }
+    .ending-message {
+      text-align: center;
+      background: linear-gradient(125deg, #ffeef2, #ffe1ea);
+      padding: 2rem;
+    }
+    .ending-message h3 {
+      font-size: 1.6rem;
+      color: #b34e6e;
+    }
+
+    /* responsive */
+    @media (max-width: 600px) {
+      .welcome-screen h1 { font-size: 2.4rem; }
+      .polaroid { padding: 12px; }
+      .section-title { font-size: 1.5rem; }
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      opacity: 0.7;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+
+<div class="heart-bg" id="heartBg"></div>
+<div class="glow-orb orb1"></div>
+<div class="glow-orb orb2"></div>
+<div class="glow-orb orb3"></div>
+
+<!-- Welcome Screen -->
+<div class="welcome-screen" id="welcomeScreen">
+  <h1>For My Love ❤️</h1>
+  <p>A little collection of memories and feelings</p>
+  <button class="open-btn" id="openAlbumBtn">✨ Open Album ✨</button>
+</div>
+
+<!-- Main Album Content -->
+<div class="main-content" id="albumMain" style="display: none;">
+  <div class="album-container active" id="albumContainer">
+    <!-- Music button (floating) -->
+    <button class="music-btn" id="musicToggleBtn">🎵 Play Music</button>
+
+    <!-- Book style photo album section -->
+    <div class="book-section">
+      <div class="book-header">✧ our scrapbook ✧</div>
+      <div class="book-scrap">
+        <div class="page-card" id="flipPageCard">
+          <div class="polaroid" id="polaroidCard">
+            <div class="photo-frame">
+              <img id="albumImage" src="https://picsum.photos/id/20/400/400" alt="romantic memory">
+            </div>
+            <div class="romantic-caption" id="photoCaption">Every moment with you feels like poetry</div>
+            <div class="heart-float-container" id="heartFloatContainer"></div>
+          </div>
+        </div>
+        <div class="flip-controls">
+          <button class="flip-btn" id="prevPageBtn">◀ Previous</button>
+          <button class="flip-btn" id="nextPageBtn">Next ▶</button>
+        </div>
+        <div class="page-indicator" id="pageIndicator">Page 1 / 12</div>
+      </div>
+    </div>
+
+    <!-- Timeline Section -->
+    <div class="timeline-section">
+      <div class="section-title">🌙 timeline of us</div>
+      <div class="timeline-grid">
+        <div class="timeline-item">✨ The first time I noticed you – a glimpse that stayed forever</div>
+        <div class="timeline-item">🌸 The first smile – the world felt warmer</div>
+        <div class="timeline-item">🌟 The moments I kept remembering – your laugh, your light</div>
+        <div class="timeline-item">🌹 Every little text that made my day brighter</div>
+        <div class="timeline-item">☁️ The quiet evenings where just thinking of you felt like home</div>
+      </div>
+    </div>
+
+    <!-- Memory Wall: Sticky Notes -->
+    <div class="memory-wall">
+      <div class="section-title">📌 memory wall</div>
+      <div class="sticky-grid">
+        <div class="sticky-note">💕 Your kindness feels like a warm cup of tea on a rainy day.</div>
+        <div class="sticky-note">✨ You have the most beautiful soul, Kona Habiba.</div>
+        <div class="sticky-note">🌷 The way you smile makes flowers jealous.</div>
+        <div class="sticky-note">🎀 Every little thing you do becomes a memory I treasure.</div>
+        <div class="sticky-note">🌟 You are poetry in a world full of prose.</div>
+        <div class="sticky-note">💖 If I could, I'd collect all your laughter and keep it safe.</div>
+      </div>
+    </div>
+
+    <!-- Reasons why you are special -->
+    <div class="reasons-section" id="reasonsSection">
+      <div class="section-title">💌 reasons why you are special</div>
+      <div class="reasons-list" id="reasonsList">
+        <!-- reasons dynamically added from js for animated reveal -->
+      </div>
+    </div>
+
+    <!-- Final romantic message -->
+    <div class="ending-message">
+      <h3>You may not know it, but you became someone special in my story ❤️</h3>
+      <p style="margin-top:12px;">every page, every heartbeat… forever grateful for you.</p>
+    </div>
+    <footer>with love, always. ✨</footer>
+  </div>
+</div>
+
+<audio id="bgMusic" loop preload="auto">
+  <source src="https://cdn.pixabay.com/download/audio/2022/05/16/audio_361b6a2e27.mp3?filename=romantic-piano-2022-05-16.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+  // Photo album data (12 romantic polaroid pages)
+  const albumData = [
+    { img: "image1.jpg", caption: "The photo Create a red alarm too mee 🌅" },
+    { img: "image2.jpg", caption: "The Most Cutest Picture I've Ever Seen 😭😭" },
+    { img: "image3.jpg", caption: "I'm Cryingg 😭😭" },
+    { img: "image4.jpg", caption: "The Photo which confirmed me Porii Exist ✨" },
+    { img: "image5.jpg", caption: "The Photo i noticed your Glasses" },
+    { img: "image6.jpg", caption: "a melody only your smile can create 🎶" },
+    { img: "image7.jpg", caption: "The best photo for me, this is also my walpaper btw 🌹" },
+    { img: "image8.jpg", caption: "shariiiiiii 😭😭" },
+    { img: "image9.jpg", caption: "and in a world of chaos, you are my calm 🕊️" },
+  ];
+
+  let currentPage = 0;
+  const totalPages = albumData.length;
+  let flipLock = false;
+
+  // DOM elements
+  const albumImage = document.getElementById('albumImage');
+  const photoCaption = document.getElementById('photoCaption');
+  const pageIndicator = document.getElementById('pageIndicator');
+  const prevBtn = document.getElementById('prevPageBtn');
+  const nextBtn = document.getElementById('nextPageBtn');
+  const pageCard = document.getElementById('flipPageCard');
+  const heartFloatContainer = document.getElementById('heartFloatContainer');
+
+  // Helper: generate floating mini hearts inside the polaroid (small floating animations)
+  function generateMiniHearts() {
+    heartFloatContainer.innerHTML = '';
+    const heartCount = 10;
+    for (let i = 0; i < heartCount; i++) {
+      const heart = document.createElement('div');
+      heart.classList.add('mini-heart');
+      heart.innerHTML = ['❤️', '💖', '💗', '🌸', '✨'][Math.floor(Math.random() * 5)];
+      const size = Math.random() * 16 + 12;
+      heart.style.fontSize = size + 'px';
+      heart.style.left = Math.random() * 100 + '%';
+      heart.style.bottom = Math.random() * 30 + '%';
+      heart.style.animationDelay = Math.random() * 5 + 's';
+      heart.style.animationDuration = Math.random() * 3 + 3 + 's';
+      heart.style.opacity = Math.random() * 0.6 + 0.3;
+      heartFloatContainer.appendChild(heart);
+    }
+  }
+
+  // load current page content with floating hearts
+  function loadPageContent() {
+    const data = albumData[currentPage];
+    albumImage.src = data.img;
+    albumImage.alt = `memory ${currentPage+1}`;
+    photoCaption.innerText = data.caption;
+    generateMiniHearts(); // refresh floating hearts per page
+    pageIndicator.innerText = `Page ${currentPage+1} / ${totalPages}`;
+  }
+
+  // page flip animation effect using class + update after transition
+  function performFlip(direction) {
+    if (flipLock) return;
+    let newIndex = currentPage + direction;
+    if (newIndex < 0 || newIndex >= totalPages) return;
+
+    flipLock = true;
+    pageCard.classList.add('flipping');
+    
+    setTimeout(() => {
+      currentPage = newIndex;
+      loadPageContent();
+      setTimeout(() => {
+        pageCard.classList.remove('flipping');
+        flipLock = false;
+      }, 120);
+    }, 150);
+  }
+
+  // prev/next event listeners
+  prevBtn.addEventListener('click', () => performFlip(-1));
+  nextBtn.addEventListener('click', () => performFlip(1));
+
+  // initial load
+  loadPageContent();
+
+  // ---------- BACKGROUND HEART GENERATOR (floating background hearts) ----------
+  function createFloatingHeart() {
+    const heartDiv = document.createElement('div');
+    heartDiv.classList.add('heart-particle');
+    heartDiv.innerHTML = ['❤️', '💖', '💕', '🌸', '🌹', '✨'][Math.floor(Math.random() * 6)];
+    heartDiv.style.left = Math.random() * 100 + '%';
+    heartDiv.style.fontSize = Math.random() * 20 + 12 + 'px';
+    heartDiv.style.animationDuration = Math.random() * 6 + 5 + 's';
+    heartDiv.style.opacity = Math.random() * 0.5 + 0.3;
+    document.getElementById('heartBg').appendChild(heartDiv);
+    setTimeout(() => { heartDiv.remove(); }, 7000);
+  }
+  setInterval(createFloatingHeart, 800);
+
+  // ---------- MUSIC CONTROL ----------
+  const bgAudio = document.getElementById('bgMusic');
+  const musicBtn = document.getElementById('musicToggleBtn');
+  let musicPlaying = false;
+  musicBtn.addEventListener('click', () => {
+    if (musicPlaying) {
+      bgAudio.pause();
+      musicBtn.innerHTML = '🎵 Play Music';
+      musicPlaying = false;
+    } else {
+      bgAudio.play().catch(e => console.log("autoplay blocked, user gesture needed"));
+      musicBtn.innerHTML = '🔊 Pause Music';
+      musicPlaying = true;
+    }
+  });
+  // optional: autoplay not forced, but after open album user may click.
+
+  // ---------- OPEN ALBUM transition ----------
+  const welcomeScreen = document.getElementById('welcomeScreen');
+  const albumMain = document.getElementById('albumMain');
+  const openBtn = document.getElementById('openAlbumBtn');
+
+  openBtn.addEventListener('click', () => {
+    welcomeScreen.classList.add('hide');
+    setTimeout(() => {
+      welcomeScreen.style.display = 'none';
+      albumMain.style.display = 'block';
+      document.body.style.overflow = 'auto';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 1000);
+    // (optional) add extra floating hearts burst when opening
+    for(let i=0;i<12;i++) setTimeout(()=>createFloatingHeart(), i*80);
+  });
+
+  // ---------- REASONS SECTION: ANIMATED TEXT REVEAL (type reveal using Intersection Observer) ----------
+  const reasonsArray = [
+    "🌟 You make the world look softer, kinder.",
+    "💖 Your presence feels like a gentle lullaby.",
+    "🌸 You see beauty in things others ignore.",
+    "✨ Your smile can heal a tired day.",
+    "💌 You are art, the kind that breathes and feels.",
+  ];
+  const reasonsListDiv = document.getElementById('reasonsList');
+  reasonsArray.forEach(reason => {
+    const reasonCard = document.createElement('div');
+    reasonCard.classList.add('reason-card');
+    reasonCard.innerText = reason;
+    reasonsListDiv.appendChild(reasonCard);
+  });
+
+  // reveal reasons when they come into viewport (adding class)
+  const reasonElements = document.querySelectorAll('.reason-card');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('reveal');
+      }
+    });
+  }, { threshold: 0.3 });
+  reasonElements.forEach(el => observer.observe(el));
+
+  // also manually trigger for initial if visible
+  setTimeout(() => {
+    reasonElements.forEach(el => { if(el.getBoundingClientRect().top < window.innerHeight) el.classList.add('reveal'); });
+  }, 500);
+
+  // Sticky note hover floating effect is in css, no extra needed.
+  // additional tiny heart animation for timeline items : hover glow
+  // ensure smooth page flip and image loading robust.
+  // loading placeholder not broken because picsum works.
+
+  // set manual preload for better experience: images have crossOrigin 
+  window.addEventListener('load', () => {
+    // Preload album images ? minor
+    albumData.forEach(item => { const img = new Image(); img.src = item.img; });
+    // add some floating style additional to background
+  });
+
+  // handle dynamic photos and also responsive image sizes.
+  // generate extra memory interactive softness.
+  // add timeline effect sparkles?
+  const timelineItems = document.querySelectorAll('.timeline-item');
+  timelineItems.forEach(item => {
+    item.addEventListener('mouseenter', () => {
+      item.style.background = '#fff0f0';
+      item.style.transform = 'scale(1.01)';
+    });
+    item.addEventListener('mouseleave', () => {
+      item.style.background = 'rgba(255,255,250,0.7)';
+      item.style.transform = 'scale(1)';
+    });
+  });
+  
+  // also music can be manually started, but just to hint
+  console.log("Romantic album ready for Dia 💗");
+</script>
+</body>
+</html>
